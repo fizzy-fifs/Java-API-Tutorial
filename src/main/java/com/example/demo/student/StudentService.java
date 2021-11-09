@@ -3,6 +3,7 @@ package com.example.demo.student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,26 @@ public class StudentService {
         studentRepository.save(student);
     }
 
-//    public void deleteStudent(Long id) {
-//    }
+    public void deleteStudent(Long studentId) {
+        boolean exists = studentRepository.existsById(studentId);
+        if (!exists) {
+            throw new IllegalStateException("student with id " + studentId + " does not exists");
+        }
+        studentRepository.deleteById(studentId);
+    }
+
+    @Transactional
+    public void updateStudent(Long studentId, Student newStudentinfo) {
+        Student currentStudentInfo = studentRepository.getById(studentId);
+
+        if (currentStudentInfo == null) {
+            throw new IllegalStateException("student with id " + studentId + " does not exists");
+        }
+
+        currentStudentInfo.setName(newStudentinfo.getName());
+        currentStudentInfo.setEmail(newStudentinfo.getEmail());
+        currentStudentInfo.setDob(newStudentinfo.getDob());
+
+        studentRepository.save(currentStudentInfo);
+    }
 }
